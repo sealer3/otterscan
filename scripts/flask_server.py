@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from flask import Flask, send_from_directory, send_file
 from werkzeug.exceptions import NotFound, Forbidden
 import pathlib
@@ -15,3 +16,6 @@ def show_path(subpath):
         return send_from_directory(dist_folder, subpath, max_age=3600*24*3)
     except (NotFound, Forbidden) as e:
         return show_index()
+
+if __name__ == "__main__":
+    app.run()
