@@ -7,11 +7,11 @@ dist_folder = pathlib.Path('../dist')
 
 @app.route('/')
 def show_index():
-    return send_file(dist_folder / 'index.html', mimetype='text/html', max_age=3600)
+    return send_file(dist_folder / 'index.html', mimetype='text/html', max_age=3600*24)
 
 @app.route('/<path:subpath>')
 def show_path(subpath):
     try:
-        return send_from_directory(dist_folder, subpath)
+        return send_from_directory(dist_folder, subpath, max_age=3600*24*3)
     except (NotFound, Forbidden) as e:
         return show_index()
