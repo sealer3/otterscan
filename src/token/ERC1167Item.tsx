@@ -1,40 +1,47 @@
-import { FC, memo, useContext } from "react";
+import { FC, memo } from "react";
 import DecoratedAddressLink from "../execution/components/DecoratedAddressLink";
 import BlockLink from "../components/BlockLink";
 import TimestampAge from "../components/TimestampAge";
 import AddressHighlighter from "../components/AddressHighlighter";
-import { RuntimeContext } from "../useRuntime";
-import { ContractMatch, useBlockData, useERC1167Impl } from "../useErigonHooks";
+import { ChecksummedAddress } from "../types";
+import { ResultMapper } from "../ots2/useUIHooks";
 
 type ERC1167ItemProps = {
-  m: ContractMatch;
+  blockNumber: number;
+  timestamp: number;
+  address: ChecksummedAddress;
+  implementation: ChecksummedAddress;
 };
 
-const ERC1167Item: FC<ERC1167ItemProps> = ({ m: { address, blockNumber } }) => {
-  const { provider } = useContext(RuntimeContext);
-  const erc1167Impl = useERC1167Impl(provider, address);
-  const block = useBlockData(provider, blockNumber.toString());
+export const mapper: ResultMapper<ERC1167ItemProps> = (m, blocksSummary) => ({
+  blockNumber: m.blockNumber,
+  timestamp: blocksSummary.get(m.blockNumber)!.timestamp,
+  address: m.address,
+  implementation: m.implementation,
+});
 
-  return (
-    <tr>
-      <td>
-        <DecoratedAddressLink address={address} eoa={false} plain />
-      </td>
-      <td>
-        <BlockLink blockTag={blockNumber} />
-      </td>
-      <td>{block && <TimestampAge timestamp={block.timestamp} />}</td>
-      {erc1167Impl ? (
-        <td className="inline-flex">
-          <AddressHighlighter address={erc1167Impl}>
-            <DecoratedAddressLink address={erc1167Impl} eoa={false} />
-          </AddressHighlighter>
-        </td>
-      ) : (
-        <td></td>
-      )}
-    </tr>
-  );
-};
+const ERC1167Item: FC<ERC1167ItemProps> = ({
+  blockNumber,
+  timestamp,
+  address,
+  implementation,
+}) => (
+  <>
+    <td>
+      <DecoratedAddressLink address={address} eoa={false} plain />
+    </td>
+    <td>
+      <BlockLink blockTag={blockNumber} />
+    </td>
+    <td>
+      <TimestampAge timestamp={timestamp} />
+    </td>
+    <td className="inline-flex">
+      <AddressHighlighter address={implementation}>
+        <DecoratedAddressLink address={implementation} eoa={false} />
+      </AddressHighlighter>
+    </td>
+  </>
+);
 
 export default memo(ERC1167Item);
