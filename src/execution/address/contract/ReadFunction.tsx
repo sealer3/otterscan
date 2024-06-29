@@ -187,6 +187,12 @@ const ReadFunction: FC<ReadFunctionProps> = ({ address, func, devMethod }) => {
   async function submitCall() {
     let int = new Interface([func]);
     if (provider) {
+      let blockTag = blockNumber || "latest";
+      if (/^\d+$/.test(blockNumber)) {
+        const num = BigInt(blockNumber);
+        blockTag = "0x" + num.toString(16);
+      }
+
       try {
         setResult(undefined);
         // The parser can be recompiled with `npm run build-parsers`
@@ -201,11 +207,6 @@ const ReadFunction: FC<ReadFunctionProps> = ({ address, func, devMethod }) => {
             ),
           ),
         );
-        let blockTag = blockNumber || "latest";
-        if (/^\d+$/.test(blockNumber)) {
-          const num = BigInt(blockNumber);
-          blockTag = "0x" + num.toString(16);
-        }
         let resultData = await provider.call({
           from: sender || null,
           to: address,
@@ -222,6 +223,21 @@ const ReadFunction: FC<ReadFunctionProps> = ({ address, func, devMethod }) => {
         });
         setError(null);
       } catch (e: any) {
+        if (blockTag !== "latest") {
+          try {
+            provider
+              .send("ots_hasCode", [address, blockTag])
+              .then((hasCode) => {
+                if (!hasCode) {
+                  setError(
+                    e.toString() + " (Contract not deployed at this time.)",
+                  );
+                }
+              });
+          } catch (e) {
+            console.error("Failed to call ots_hasCode:", e);
+          }
+        }
         setResult(null);
         setError(e.toString());
       }
