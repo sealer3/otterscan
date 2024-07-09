@@ -294,7 +294,7 @@ const ReadFunction: FC<ReadFunctionProps> = ({ address, func, devMethod }) => {
             )
           }
         >
-          <div className="ml-6">
+          <div className="ml-4 mt-1">
             <div className="text-xs">Block Number</div>
             <input
               type="text"
