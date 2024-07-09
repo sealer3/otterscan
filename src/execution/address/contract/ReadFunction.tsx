@@ -13,6 +13,7 @@ import { FC, FormEvent, memo, useContext, useRef, useState } from "react";
 import Accordion from "../../../components/Accordion";
 import { DevMethod } from "../../../sourcify/useSourcify";
 import { useChainInfo } from "../../../useChainInfo";
+import { useLatestBlockNumber } from "../../../useLatestBlock";
 import { RuntimeContext } from "../../../useRuntime";
 import ParamDeclaration from "../../components/ParamDeclaration";
 import OutputDecoder from "../../transaction/decoder/OutputDecoder";
@@ -182,6 +183,7 @@ const ReadFunction: FC<ReadFunctionProps> = ({ address, func, devMethod }) => {
     new Array(func.inputs.length).fill(null),
   );
   const { provider } = useContext(RuntimeContext);
+  const latestBlockNumber = useLatestBlockNumber(provider);
   const { nativeCurrency } = useChainInfo();
 
   async function submitCall() {
@@ -298,10 +300,22 @@ const ReadFunction: FC<ReadFunctionProps> = ({ address, func, devMethod }) => {
             <div className="text-xs">Block Number</div>
             <input
               type="text"
+              value={blockNumber}
               className="mt-1 w-48 rounded border px-2 py-1 text-sm text-gray-600"
               onChange={(e) => setBlockNumber(e.target.value)}
               placeholder="latest"
             />
+            <button
+              type="button"
+              className="ml-2 mt-2 rounded border bg-skin-button-fill px-3 py-1 text-left text-sm text-skin-button hover:bg-skin-button-hover-fill"
+              onClick={() => {
+                if (latestBlockNumber !== undefined) {
+                  setBlockNumber(latestBlockNumber.toString());
+                }
+              }}
+            >
+              Latest
+            </button>
             <div className="text-xs">Sender</div>
             <input
               type="text"
