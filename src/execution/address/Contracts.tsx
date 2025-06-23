@@ -102,7 +102,10 @@ const Contracts: React.FC<ContractsProps> = ({ checksummedAddress, match }) => {
     sourceDecorations.push({
       start: { line: highlightLines[0] - 1, character: 0 },
       end: { line: highlightLines[1], character: 0 },
-      properties: { class: "bg-source-line-bg-highlight bg-clip-padding" },
+      properties: {
+        class:
+          "bg-source-line-bg-highlight bg-clip-padding w-full inline-block",
+      },
     });
   }
 
